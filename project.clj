@@ -1,6 +1,6 @@
 (defproject yetibot "0.5.16-SNAPSHOT"
   :description "A command line in your chat, where chat ∈ {irc,slack}."
-  :url "https://github.com/yetibot/yetibot"
+  :url "https://github.com/audaxion/yetibot"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :deploy-repositories [["releases" :clojars]]
@@ -108,6 +108,6 @@
 
   ;; :pedantic :ignore
 
-  :docker {:image-name "yetibot/yetibot"}
+  :docker {:image-name "audaxion/bonder"}
 
   :main yetibot.core.init)
