@@ -4,7 +4,7 @@
     [yetibot.core.hooks :refer [cmd-hook]]))
 
 (defn endpoint
-  ([] ("http://xkcd.com/info.0.json"))
+  ([] (str "http://xkcd.com/info.0.json"))
   ([num] (str "http://xkcd.com/" num "/info.0.json")))
 
 (defn xkcd-current-cmd
