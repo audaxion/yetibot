@@ -19,7 +19,7 @@ set -ev
   if [[ "$version" =~ SNAPSHOT ]]; then
     echo "Snapshot version, tagging docker snapshot and pushing..."
     docker tag audaxion/bonder:"$version" audaxion/bonder:snapshot
-    docker push audaxion/yetibot:snapshot
+    docker push audaxion/bonder:snapshot
   else
     echo "Release version, tagging docker latest and pushing..."
     docker tag audaxion/bonder:"$version" audaxion/bonder:latest
