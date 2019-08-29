@@ -51,16 +51,24 @@
   (:screen_name (:user json)))
 
 (defn format-media-urls [json]
-  (info (:entities json))
+  ;; (info (:entities json))
   (->> (:entities json)
        :media
        (map :media_url)
        (join " ")))
 
-(defn format-tweet-text [json]
-  (str (:text json) " " (format-media-urls json)))
+(defn format-tweet-text [{:keys [extended_tweet] :as json}]
+  ;; use extended_tweet if available; otherwise fallback to regular json entity:
+  ;; extended_tweet support's Twitter's new 280 char and is only set if the Tweet
+  ;; exceeds 140 chars
+  (let [tweet (or extended_tweet json)]
+    (str
+      (or (:full_text tweet)
+          (:text tweet))
+      " " (format-media-urls tweet))))
 
-(defn format-tweet [json]
+(defn format-tweet [{:keys [extended_tweet] :as json}]
+  #_(info "tweet json" (pr-str json))
   (let [screen-name (format-screen-name json)
         url (format-url screen-name (:id json))
         retweeted-status (:retweeted_status json)
@@ -73,31 +81,46 @@
             ; (-> (:text json) expand-twitter-urls html-decode)
             screen-name url)))
 
-(defn send-tweet [json]
+(defn send-tweet
+  "Broadcast tweet to any channels that have broadcast: true, e.g.:
+   channel set broadcast true"
+  [json]
+  #_(info "send-tweet" (pr-str json))
   (chat/broadcast (format-tweet json)))
 
 ;;;; streaming callback
 
-(defn succ [x y]
+(defn succ
+  "Streaming callback success
+   - response = the response that has the status and headers
+   - baos = the ByteArrayOutputStream that contains a chunk of the stream"
+  [response baos]
   (try
-    (let [raw (str y)
+    (let [raw (str baos)
           json (if-not (empty? raw) (json/read-json raw))]
       (if (and json (:user json))
         (send-tweet json)))
     (catch Exception e)))
 
-(def fail (comp
-            (fn [error-response] (error "twitter streaming error" error-response))
-            response-return-everything))
+(def fail
+  (comp
+    (fn [error-response]
+      (error "twitter streaming error" error-response))
+    ;; response-return-everything
+    ))
 
-(def exception (fn [exception] (error "twitter streaming exception" exception)))
+(defn exception [response exception]
+  (error "twitter streaming exception"
+         (pr-str response)
+         (pr-str exception)))
 
 (def streaming-callback (AsyncStreamingCallback. succ fail exception))
 
 ;;;; user stream
 
 (defonce user-stream-resp
-  (future (user-stream :oauth-creds creds :callbacks streaming-callback)))
+  (future
+    (user-stream :oauth-creds creds :callbacks streaming-callback)))
 
 ;;;; search
 
@@ -105,11 +128,15 @@
   (info "twitter search for" query)
   (search-tweets
     :oauth-creds creds
-    :params {:count 20 :q query :lang (:lang (:search config))}))
+    :params {:tweet_mode "extended"
+             :count 20
+             :q query
+             :lang (:lang (:search config))}))
+
 
 ;;;; topic tracking
 
-(def statuses-streaming-response (atom nil))
+(defonce statuses-streaming-response (atom nil))
 
 (defn reset-streaming-topics [ts]
   ; first cancel the streaming-response if it exists
@@ -120,15 +147,34 @@
                            :oauth-creds creds
                            :callbacks streaming-callback)))
 
-(defn reload-topics [] (reset-streaming-topics (map :topic (db/find-all))))
+(comment
+  ;; reset the stream:
+  (reload-topics)
+
+  ;; inspect the current state of the streaming connection
+  (meta @statuses-streaming-response)
+
+  ((:cancelled? (meta @statuses-streaming-response)))
+
+  ;; stop the stream
+  ((:cancel (meta @statuses-streaming-response)))
+
+  )
+
+(defn reload-topics []
+  (let [topics (db/find-all)]
+    (info "reloading stream for topics" (pr-str topics))
+    (reset-streaming-topics (map :topic topics))))
 
 (defn add-topic [user-id topic]
-  (db/create {:user-id user-id :topic topic})
-  (reload-topics))
+  (let [result (db/create {:user-id user-id :topic topic})]
+    (reload-topics)
+    result))
 
 (defn remove-topic [topic-id]
-  (db/delete topic-id)
-  (reload-topics))
+  (let [result (db/delete topic-id)]
+    (reload-topics)
+    result))
 
 ;; on startup, load the existing topics
 (future (reload-topics))
@@ -178,6 +224,7 @@
 (defn user-timeline [screen-name & tweet-count]
    (statuses-user-timeline :oauth-creds creds
                            :params {:screen-name screen-name
+                                    :tweet_mode "extended"
                                     :count (if-not (nil? tweet-count)
                                              tweet-count
                                              3)}))
@@ -185,7 +232,8 @@
 
 (defn show [id]
   (statuses-show-id :oauth-creds creds
-                    :params {:id id}))
+                    :params {:tweet_mode "extended"
+                             :id id}))
 
 ;; db helpers
 
@@ -194,3 +242,27 @@
 
 (defn find-all []
   (db/find-all))
+
+;; scratch
+
+(comment
+
+  (->>
+    (search "#rot13")
+    :body
+    :statuses
+    first
+    )
+
+
+  (->>
+    (search "#rot13")
+    :body
+    keys)
+
+  (->>
+    (search "#rot13")
+    :body
+    :search_metadata)
+
+  )

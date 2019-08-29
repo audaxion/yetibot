@@ -3,8 +3,114 @@
 Note: `yetibot` depends on [yetibot.core](https://github.com/yetibot/yetibot.core)
 which contains Yetibot's core functionality along with a few commands. See
 [yetibot.core's
-changelog](https://github.com/yetibot/yetibot.core/blob/master/doc/CHANGELOG.md)
+cpihangelog](https://github.com/yetibot/yetibot.core/blob/master/doc/CHANGELOG.md)
 as well.
+
+- Add `tldr` command
+
+## 0.5.35 - 8/26/19
+
+- Add `man` command - [#957](https://github.com/yetibot/yetibot/pull/957) by
+  [anthonygalea](https://github.com/anthonygalea)
+
+## 0.5.32 - 5/17/2019
+
+- Fixup sub command parsing in `pagerduty` so it accepts queries with whitespace
+  in commands like `pd users <query>` and `pd teams <query>`
+- Add better error handling in `pagerduty` for non-200 API responses
+
+## 0.5.31 - 5/7/2019
+
+- Upgrade to yetibot.core 0.5.21
+
+## 0.5.30 - 4/31/2019
+
+- Another fix for clj when data contains lazy seqs
+- Security fix to prevent access of `yetibot.*` namespaces from inside the `clj`
+  command
+
+## 0.5.29 - 4/29/2019
+
+- Fix data on clj when data is a lazy seq
+  [#944](https://github.com/yetibot/yetibot/pull/944)
+
+## 0.5.28 - 4/26/2019
+
+- Upgrade to yetibot.core 0.5.10
+- Fix Dockerfile CMD syntax [#938](https://github.com/yetibot/yetibot/pull/938)
+  by [maplemuse](https://github.com/maplemuse)
+
+## 0.5.27 - 4/18/2019
+
+- Avoid nil description on github repos commands
+
+## 0.5.26 - 4/17/2019
+
+- Get extended tweets when fetching user timeline
+  [#933](https://github.com/yetibot/yetibot/pull/933)
+
+## 0.5.25 - 4/16/2019
+
+- Upgrade to yetibot.core 0.5.19
+
+## 0.5.24 - 4/16/2019
+
+- Upgrade to yetibot.core 0.5.18
+
+## 0.5.23 - 4/15/2019
+
+- Upgrade to yetibot.core 0.5.17
+- Fixup extended tweet handling in Twitter
+
+## 0.5.22 - 4/12/2019
+
+- Add a `cljquotes` command for spouting random quotes about Clojure -
+  [#928](https://github.com/yetibot/yetibot/pull/928) by
+  [justone](https://github.com/justone)
+
+## 0.5.21 - 4/12/2019
+
+- Upgrade to yetibot.core 0.5.16
+
+## 0.5.20 - 4/12/2019
+
+- Apply a new fix for `clj` by ensuring the proper `.java.policy` location when
+  running in Docker
+
+## 0.5.19 - 4/11/2019
+
+- Fixup `clj` command to prevent security exceptions and allow access to data
+  across pipes in the `clj` command
+  [#926](https://github.com/yetibot/yetibot/pull/926)
+
+## 0.5.18 - 4/10/2019
+
+- Upgrade to yetibot.core
+
+## 0.5.17 - 4/9/2019
+
+- Added data and error handling to Twitter commands
+- Include full text in Twitter posts instead of the abbreviated version
+
+## 0.5.16 - 4/2/2019
+
+Weather and JIRA improvements this release!
+
+- Add option to specify temps in C or F on weather
+  [#910](https://github.com/yetibot/yetibot/pull/910)
+  by [@jcorrado](https://github.com/jcorrado)
+- Fix weather parser [#907](https://github.com/yetibot/yetibot/pull/907)
+  by [@jcorrado](https://github.com/jcorrado)
+- Add ability to specify reporter when creating jira issues
+  [#916](https://github.com/yetibot/yetibot/pull/916)
+- Allow specifying issue type when creating jira issues
+  [#913](https://github.com/yetibot/yetibot/pull/913)
+- Add error handling when trying to create a JIRA issue without specifying a
+  project and a project was not set in the channel settings
+  improvements [#911](https://github.com/yetibot/yetibot/pull/911)
+- Add ability to log work on JIRA issue
+  [#912](https://github.com/yetibot/yetibot/pull/912)
+- Upgrade to yetibot.core 0.5.13
 
 ## 0.5.15 - 3/29/2019
 

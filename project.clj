@@ -1,4 +1,4 @@
-(defproject yetibot "0.5.16-SNAPSHOT"
+(defproject yetibot "0.5.36-SNAPSHOT"
   :description "A command line in your chat, where chat ∈ {irc,slack}."
   :url "https://github.com/audaxion/yetibot"
   :license {:name "Eclipse Public License"
@@ -15,6 +15,7 @@
                     :dependencies [[org.clojure/tools.trace "0.7.9"]
                                    [midje "1.9.4"]]}]
              :low-mem {:jvm-opts ^:replace ["-Xmx1g" "-server"]}
+             :docker {:jvm-opts ["-Djava.security.policy=/usr/src/app/.java.policy"]}
              :uberjar {:uberjar-name "yetibot.jar"
                        :jvm-opts ["-server"]
                        :aot :all}
@@ -41,7 +42,7 @@
                    (println))}
 
   :dependencies [[org.clojure/clojure "1.10.0"]
-                 [yetibot.core "0.5.12"]
+                 [yetibot/core "20190806.223212.963edbe"]
 
                  ; apis
                  [twitter-api "1.8.0"]
@@ -71,16 +72,7 @@
                  [com.vdurmont/emoji-java "4.0.0"]
 
                  ; repls
-                 [clojail "1.0.6"
-                  ;; clojail hasn't been updated in a long time, so exclude its
-                  ;; deps
-                  :exclusions [org.clojure/clojure
-                               org.flatland/useful
-                               ;; Note: excluding bultitude disables clojail's
-                               ;; `blanket` feature
-                               bultitude
-                               ]]
-                 [bultitude "0.2.8"]
+                 [juji/clojail "1.0.9"]
 
                  ;encoding
                  [org.clojure/data.codec "0.1.1"]
